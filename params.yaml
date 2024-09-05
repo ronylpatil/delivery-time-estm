@@ -1,1 +1,9 @@
 # parameters
+base:
+  project_name: delivery-time-estimation
+  target: Time_taken(min)
+
+load_dataset:
+  bucket: delivery-time-estimate-data
+  filename: train.csv
+  raw_data: /data/raw
