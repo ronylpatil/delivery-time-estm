@@ -7,3 +7,10 @@ load_dataset:
   bucket: delivery-time-estimate-data
   filename: train.csv
   raw_data: /data/raw
+
+make_dataset:
+  input_path: data/raw/train.csv
+  test_split: 0.25
+  seed: 42
+  export_path: data/interim
+
