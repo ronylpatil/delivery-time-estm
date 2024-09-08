@@ -137,14 +137,6 @@ def impute_nan(train: pd.DataFrame, test: pd.DataFrame) -> pd.DataFrame:
     return train, test
 
 
-def save(df: pd.DataFrame, path: str) -> None:
-
-    # if path not exist then raise error
-    # if dataframe is empty raise errors
-
-    pass
-
-
 if __name__ == "__main__":
     infologger.info("executing data_cleaning.py as __main__")
 
@@ -164,6 +156,3 @@ if __name__ == "__main__":
 
     # handling missing values
     final_train, final_test = impute_nan(train=clean_train, test=clean_test)
-
-    # final_train.to_csv(f"{home_dir}/data/external/train.csv", index=False)
-    # final_test.to_csv(f"{home_dir}/data/external/test.csv", index=False)
