@@ -13,4 +13,5 @@ pip install -r requirements.txt
 
 echo [$(date)]: "END"
 
-# ye init setup likne k baad just "bash init_setup.sh" cmd run kr do
+# create init_setup.sh and hit [cmd: bash init_setup.sh]
+# it will create venv and install all dependencies req for this project.
