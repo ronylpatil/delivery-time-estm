@@ -517,7 +517,7 @@ if __name__ == "__main__":
     train_st5, test_st5 = preprocessing(train_st4, test_st4, path=path_labels)
 
     # save the data
-    export_path = params["export_path"]
+    export_path = f"{home_dir}/{params["export_path"]}"
     save_data(
         export_path=export_path,
         train=train_st5,
