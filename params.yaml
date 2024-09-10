@@ -10,7 +10,12 @@ load_dataset:
 
 make_dataset:
   input_path: data/raw/train.csv
-  test_split: 0.25
+  test_split: 0.2
   seed: 42
   export_path: data/interim
 
+build_features:
+  input_path__train: data/interim/train.csv
+  input_path__test: data/interim/test.csv
+  export_path: data/processed
+  labels_: src/features/labels.txt

@@ -31,7 +31,8 @@ from math import radians, sin, cos, sqrt, atan2
 
 # initial preprocessing
 def cleaning(df: pd.DataFrame) -> pd.DataFrame:  # [STEP-I]
-    """Perform initial data preprocessing on given dataframe `df`
+    """
+    Perform initial data preprocessing on given dataframe `df`
 
     Parameters
     ----------
@@ -137,6 +138,21 @@ def cleaning(df: pd.DataFrame) -> pd.DataFrame:  # [STEP-I]
 
 # fill NaN
 def impute_nan(train: pd.DataFrame, test: pd.DataFrame) -> pd.DataFrame:  # [STEP-II]
+    """
+    Impute NaN values
+
+    Parameters
+    ----------
+    train : {ndarray, dataframe}
+            Training dataset
+    test : {ndarray, dataframe}
+            Test dataset
+
+    Returns
+    -------
+    df : {ndarray, dataframe}
+        Preprocessed DataFrame
+    """
     try:
         # replace 6 ratting with median
         rating__fillna = train["Ratings"].median()
@@ -219,6 +235,19 @@ def estimated_delivery_time(df: pd.DataFrame):
 
 # building new features
 def build_features(df: pd.DataFrame) -> pd.DataFrame:  # [STEP-III]
+    """
+    Build new features from existing ones.
+
+    Parameters
+    ----------
+    df : {ndarray, dataframe}
+        Training/Testing Data
+
+    Returns
+    -------
+    df : {ndarray, dataframe}
+        Feature Engineered Data
+    """
     try:
         # calculate haversine dist
         df["haversine_dist"] = df.apply(haversine, axis=1)
@@ -268,6 +297,19 @@ def build_features(df: pd.DataFrame) -> pd.DataFrame:  # [STEP-III]
 
 # drop MAR missing values
 def drop_mar(df: pd.DataFrame) -> pd.DataFrame:  # [STEP-IV]
+    """
+    Drop co-related missing values.
+
+    Parameters
+    ----------
+    df : {ndarray, dataframe}
+        Training/Testing DataFrame
+
+    Returns
+    -------
+    df : {ndarray, dataframe}
+        Preprocessed DataFrame
+    """
     try:
         df.dropna(inplace=True)
     except Exception as e:
@@ -280,7 +322,26 @@ def drop_mar(df: pd.DataFrame) -> pd.DataFrame:  # [STEP-IV]
 
 
 # final preprocessing
-def preprocessing(train: pd.DataFrame, test: pd.DataFrame) -> pd.DataFrame:  # [STEP-V]
+def preprocessing(
+    train: pd.DataFrame, test: pd.DataFrame, path: str
+) -> pd.DataFrame:  # [STEP-V]
+    """
+    Perform final preprocessing on data.
+
+    Parameters
+    ----------
+    train: {ndarray, dataframe}
+            Training dataset
+    test: {ndarray, dataframe}
+            Test dataset
+    path: str
+          File path where label encoding will stored.
+
+    Returns
+    -------
+    df : {ndarray, dataframe}
+        Preprocessed DataFrame
+    """
     try:
         # drop lat/lon col
         # ├── Restaurant_latitude
@@ -353,47 +414,57 @@ def preprocessing(train: pd.DataFrame, test: pd.DataFrame) -> pd.DataFrame:  # [
         # NOTE: in prod we need to transform user input into numerical so keep the
         # mapping ready.
 
-        le = LabelEncoder()
+        if path.exists():
+            infologger.info(f"labels exist- [{path}]")
+            path.unlink()
+            infologger.info(f"labels dropped.")
 
-        train["Weatherconditions"] = le.fit_transform(train["Weatherconditions"])
-        test["Weatherconditions"] = le.transform(test["Weatherconditions"])
-        le_name_mapping = dict(zip(le.classes_, map(int, le.transform(le.classes_))))
-        print(le_name_mapping)
+        with open(path, "a") as f:
+            le = LabelEncoder()
 
-        train["Road_traffic_density"] = le.fit_transform(train["Road_traffic_density"])
-        test["Road_traffic_density"] = le.transform(test["Road_traffic_density"])
-        le_name_mapping = dict(zip(le.classes_, map(int, le.transform(le.classes_))))
-        print(le_name_mapping)
+            train["Weatherconditions"] = le.fit_transform(train["Weatherconditions"])
+            test["Weatherconditions"] = le.transform(test["Weatherconditions"])
+            f.write(
+                f"Weatherconditions: {dict(zip(le.classes_, map(int, le.transform(le.classes_))))}\n"
+            )
 
-        train["City"] = le.fit_transform(train["City"])
-        test["City"] = le.transform(test["City"])
-        le_name_mapping = dict(zip(le.classes_, map(int, le.transform(le.classes_))))
-        print(le_name_mapping)
+            train["Road_traffic_density"] = le.fit_transform(
+                train["Road_traffic_density"]
+            )
+            test["Road_traffic_density"] = le.transform(test["Road_traffic_density"])
+            f.write(
+                f"Road_traffic_density: {dict(zip(le.classes_, map(int, le.transform(le.classes_))))}\n"
+            )
 
-        train["Festival"] = le.fit_transform(train["Festival"])
-        test["Festival"] = le.transform(test["Festival"])
-        le_name_mapping = dict(zip(le.classes_, map(int, le.transform(le.classes_))))
-        print(le_name_mapping)
+            train["City"] = le.fit_transform(train["City"])
+            test["City"] = le.transform(test["City"])
+            f.write(
+                f"City: {dict(zip(le.classes_, map(int, le.transform(le.classes_))))}\n"
+            )
 
-        train["Type_of_vehicle"] = le.fit_transform(train["Type_of_vehicle"])
-        test["Type_of_vehicle"] = le.transform(test["Type_of_vehicle"])
-        le_name_mapping = dict(zip(le.classes_, map(int, le.transform(le.classes_))))
-        print(le_name_mapping)
+            train["Festival"] = le.fit_transform(train["Festival"])
+            test["Festival"] = le.transform(test["Festival"])
+            f.write(
+                f"Festival: {dict(zip(le.classes_, map(int, le.transform(le.classes_))))}\n"
+            )
 
-        train["Type_of_order"] = le.fit_transform(train["Type_of_order"])
-        test["Type_of_order"] = le.transform(test["Type_of_order"])
-        le_name_mapping = dict(zip(le.classes_, map(int, le.transform(le.classes_))))
-        print(le_name_mapping)
+            train["Type_of_vehicle"] = le.fit_transform(train["Type_of_vehicle"])
+            test["Type_of_vehicle"] = le.transform(test["Type_of_vehicle"])
+            f.write(
+                f"Type_of_vehicle: {dict(zip(le.classes_, map(int, le.transform(le.classes_))))}\n"
+            )
 
-        train["Vehicle_condition"] = le.fit_transform(train["Vehicle_condition"])
-        test["Vehicle_condition"] = le.transform(test["Vehicle_condition"])
-        le_name_mapping = dict(zip(le.classes_, map(int, le.transform(le.classes_))))
-        print(le_name_mapping)
+            train["Type_of_order"] = le.fit_transform(train["Type_of_order"])
+            test["Type_of_order"] = le.transform(test["Type_of_order"])
+            f.write(
+                f"Type_of_order: {dict(zip(le.classes_, map(int, le.transform(le.classes_))))}\n"
+            )
 
-        train["day"] = le.fit_transform(train["day"])
-        test["day"] = le.transform(test["day"])
-        le_name_mapping = dict(zip(le.classes_, map(int, le.transform(le.classes_))))
-        print(le_name_mapping)
+            train["day"] = le.fit_transform(train["day"])
+            test["day"] = le.transform(test["day"])
+            f.write(
+                f"day: {dict(zip(le.classes_, map(int, le.transform(le.classes_))))}\n"
+            )
 
         # fix target variable
         train["Time_taken(min)"] = (
@@ -442,7 +513,8 @@ if __name__ == "__main__":
     test_st4 = drop_mar(test_st3)
 
     # STAGE-V
-    train_st5, test_st5 = preprocessing(train_st4, test_st4)
+    path_labels = pathlib.Path(f"{home_dir}/{params['labels_']}")
+    train_st5, test_st5 = preprocessing(train_st4, test_st4, path=path_labels)
 
     # save the data
     export_path = params["export_path"]

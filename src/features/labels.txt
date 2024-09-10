@@ -1,0 +1,7 @@
+Weatherconditions: {'Cloudy': 0, 'Fog': 1, 'Sandstorms': 2, 'Stormy': 3, 'Sunny': 4, 'Windy': 5}
+Road_traffic_density: {'High': 0, 'Jam': 1, 'Low': 2, 'Medium': 3}
+City: {'Metropolitian': 0, 'Semi-Urban': 1, 'Urban': 2}
+Festival: {'No': 0, 'Yes': 1}
+Type_of_vehicle: {'electric_scooter': 0, 'motorcycle': 1, 'scooter': 2}
+Type_of_order: {'Buffet': 0, 'Drinks': 1, 'Meal': 2, 'Snack': 3}
+day: {'Friday': 0, 'Monday': 1, 'Saturday': 2, 'Sunday': 3, 'Thursday': 4, 'Tuesday': 5, 'Wednesday': 6}
