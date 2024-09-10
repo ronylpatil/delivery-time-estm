@@ -31,10 +31,10 @@ def split(df: pd.DataFrame, test_split: float, seed: int) -> pd.DataFrame:
 
 
 # save the data
-def save_data(export_path: str, train: pd.DataFrame, test: pd.DataFrame) -> None:
+def save_data(export_path: str, train: pd.DataFrame, test: pd.DataFrame, train_filename: str = 'train', test_filename: str = 'test') -> None:
     try:
-        train.to_csv(f"{export_path}/train.csv", index=False)
-        test.to_csv(f"{export_path}/test.csv", index=False)
+        train.to_csv(f"{export_path}/{train_filename}.csv", index=False)
+        test.to_csv(f"{export_path}/{test_filename}.csv", index=False)
     except Exception as e:
         infologger.info(f"unable to save the data [check save_data()]. exc: {e}")
     else:
