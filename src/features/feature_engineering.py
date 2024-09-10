@@ -487,7 +487,7 @@ if __name__ == "__main__":
 
     curr_dir = pathlib.Path(__file__)
     home_dir = curr_dir.parent.parent.parent.as_posix()
-    params = yaml.safe_load(open(home_dir + "/params.yaml"))["build_features"]
+    params = yaml.safe_load(open(home_dir + "/params.yaml"))["feature_engineering"]
 
     # reading train / test dataset path
     input_path__train = f"{home_dir}/{params['input_path__train']}"
@@ -518,4 +518,10 @@ if __name__ == "__main__":
 
     # save the data
     export_path = params["export_path"]
-    save_data(export_path=export_path, train=train_st5, test=test_st5)
+    save_data(
+        export_path=export_path,
+        train=train_st5,
+        test=test_st5,
+        train_filename=params["filename_train"],
+        test_filename=params["filename_test"],
+    )
