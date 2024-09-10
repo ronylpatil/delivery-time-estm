@@ -1,0 +1,77 @@
+schema: '2.0'
+stages:
+  load_dataset:
+    cmd: python ./src/data/load_dataset.py
+    deps:
+    - path: ./src/data/load_dataset.py
+      hash: md5
+      md5: dccdc2ec3cfda22db5d27b30dd6f7574
+      size: 2715
+    params:
+      params.yaml:
+        load_dataset.bucket: delivery-time-estimate-data
+        load_dataset.filename: train.csv
+        load_dataset.raw_data: /data/raw
+    outs:
+    - path: ./data/raw/train.csv
+      hash: md5
+      md5: 1a618965f19808eee12cdd9aac76a0dc
+      size: 7776332
+  make_dataset:
+    cmd: python ./src/data/make_dataset.py
+    deps:
+    - path: ./data/raw/train.csv
+      hash: md5
+      md5: 1a618965f19808eee12cdd9aac76a0dc
+      size: 7776332
+    - path: ./src/data/make_dataset.py
+      hash: md5
+      md5: 1c1df82e4abed0d60960517b7396403a
+      size: 2114
+    params:
+      params.yaml:
+        make_dataset.export_path: /data/interim
+        make_dataset.input_path: data/raw/train.csv
+        make_dataset.seed: 42
+        make_dataset.test_split: 0.2
+    outs:
+    - path: ./data/interim/test.csv
+      hash: md5
+      md5: 558cb0951a0bfbf1e461471f379873c8
+      size: 1555537
+    - path: ./data/interim/train.csv
+      hash: md5
+      md5: b9fa0322750583b38e0f0ce179731891
+      size: 6221136
+  feature_engineering:
+    cmd: python ./src/features/feature_engineering.py
+    deps:
+    - path: ./data/interim/test.csv
+      hash: md5
+      md5: 558cb0951a0bfbf1e461471f379873c8
+      size: 1555537
+    - path: ./data/interim/train.csv
+      hash: md5
+      md5: b9fa0322750583b38e0f0ce179731891
+      size: 6221136
+    - path: ./src/features/feature_engineering.py
+      hash: md5
+      md5: 2c8f145da5e2147530d09b3ce026a68d
+      size: 17462
+    params:
+      params.yaml:
+        feature_engineering.export_path: /data/processed
+        feature_engineering.filename_test: processed_test
+        feature_engineering.filename_train: processed_train
+        feature_engineering.input_path__test: data/interim/test.csv
+        feature_engineering.input_path__train: data/interim/train.csv
+        feature_engineering.labels_: src/features/labels.txt
+    outs:
+    - path: ./data/processed/processed_test.csv
+      hash: md5
+      md5: e812d49c3b3b641bdccc6aed52e49ec1
+      size: 500619
+    - path: ./data/processed/processed_train.csv
+      hash: md5
+      md5: 4a91da2fdfb01444b323df2498a95586
+      size: 2002558
