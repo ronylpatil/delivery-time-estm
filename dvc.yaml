@@ -1,1 +1,42 @@
-# pipeline
+stages:
+  load_dataset:
+    cmd: python ./src/data/load_dataset.py
+    deps:
+    - ./src/data/load_dataset.py
+    params:
+    - load_dataset.bucket
+    - load_dataset.raw_data
+    - load_dataset.filename
+    outs:
+    - .${load_dataset.raw_data}/${load_dataset.filename}
+
+  make_dataset:
+    cmd: python ./src/data/make_dataset.py
+    deps:
+    - ./src/data/make_dataset.py
+    - .${load_dataset.raw_data}/${load_dataset.filename}
+    params:
+    - make_dataset.input_path
+    - make_dataset.test_split
+    - make_dataset.seed
+    - make_dataset.export_path
+    outs:
+    - .${make_dataset.export_path}/train.csv
+    - .${make_dataset.export_path}/test.csv
+
+  feature_engineering:
+    cmd: python ./src/features/feature_engineering.py
+    deps:
+    - ./src/features/feature_engineering.py
+    - .${make_dataset.export_path}/train.csv
+    - .${make_dataset.export_path}/test.csv
+    params:
+    - feature_engineering.input_path__train
+    - feature_engineering.input_path__test
+    - feature_engineering.export_path
+    - feature_engineering.labels_
+    - feature_engineering.filename_train
+    - feature_engineering.filename_test
+    outs:
+    - .${feature_engineering.export_path}/${feature_engineering.filename_train}.csv
+    - .${feature_engineering.export_path}/${feature_engineering.filename_test}.csv
