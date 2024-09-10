@@ -14,8 +14,10 @@ make_dataset:
   seed: 42
   export_path: data/interim
 
-build_features:
+feature_engineering:
   input_path__train: data/interim/train.csv
   input_path__test: data/interim/test.csv
   export_path: data/processed
   labels_: src/features/labels.txt
+  filename_train: processed_train 
+  filename_test: processed_test
