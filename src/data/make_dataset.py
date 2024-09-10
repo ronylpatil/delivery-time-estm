@@ -52,4 +52,5 @@ if __name__ == "__main__":
 
     df = load_data(input_path=input_path)
     train, test = split(df, test_split=params["test_split"], seed=params["seed"])
-    save_data(params["export_path"], train=train, test=test)
+    
+    save_data(f"{home_dir}/{params["export_path"]}", train=train, test=test)
