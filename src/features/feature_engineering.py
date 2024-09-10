@@ -139,7 +139,7 @@ def cleaning(df: pd.DataFrame) -> pd.DataFrame:  # [STEP-I]
 # fill NaN
 def impute_nan(train: pd.DataFrame, test: pd.DataFrame) -> pd.DataFrame:  # [STEP-II]
     """
-    Impute NaN values
+    Fill NaN with suitable values
 
     Parameters
     ----------
@@ -296,6 +296,7 @@ def build_features(df: pd.DataFrame) -> pd.DataFrame:  # [STEP-III]
 
 
 # drop MAR missing values
+# there're diff approach to handle MAR, but I preffered droping them
 def drop_mar(df: pd.DataFrame) -> pd.DataFrame:  # [STEP-IV]
     """
     Drop co-related missing values.
@@ -326,7 +327,7 @@ def preprocessing(
     train: pd.DataFrame, test: pd.DataFrame, path: str
 ) -> pd.DataFrame:  # [STEP-V]
     """
-    Perform final preprocessing on data.
+    Perform final preprocessing on the data.
 
     Parameters
     ----------
