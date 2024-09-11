@@ -324,7 +324,7 @@ def drop_mar(df: pd.DataFrame) -> pd.DataFrame:  # [STEP-IV]
 
 # final preprocessing
 def preprocessing(
-    train: pd.DataFrame, test: pd.DataFrame, path: str
+    train: pd.DataFrame, test: pd.DataFrame, path: pathlib.Path
 ) -> pd.DataFrame:  # [STEP-V]
     """
     Perform final preprocessing on the data.
