@@ -19,5 +19,53 @@ feature_engineering:
   input_path__test: data/interim/test.csv
   export_path: /data/processed
   labels_: src/features/labels.txt
-  filename_train: processed_train 
+  filename_train: processed_train
   filename_test: processed_test
+
+train_model:
+  # {decision_tree: 'dt', random_forest: 'rf', gradient boost: 'gb', xgboost: 'xgb', all models: 'all'}
+  model_to_train: rf
+
+  decision_tree:
+    criterion: squared_error
+    max_depth: 35
+    min_samples_split: 40
+    min_samples_leaf: 200
+    max_features: sqrt
+    max_leaf_nodes: 80
+
+  random_forest:
+    n_estimators: 100
+    criterion: squared_error
+    max_depth: 10
+    min_samples_split: 40
+    min_samples_leaf: 150
+    max_features: 0.7
+    max_leaf_nodes: 50
+    oob_score: True
+    max_samples: 9000
+
+  gradient_boost:
+    loss:
+    learning_rate:
+    n_estimators:
+    subsample:
+    min_samples_split:
+    min_weight_fraction_leaf:
+    max_depth:
+    max_features:
+    max_leaf_nodes:
+    n_iter_no_change:
+
+  xgb:
+    booster: gbree # {gbtree, gblinear, dart}
+    verbosity: 0 # {print message for debuging 0: None, 1: warning, 2: info, 3: debug}
+    eta: 0.3 # {learning rate}
+    gamma: 0 # {}
+    max_depth: 6 # {}
+    lambda: 1
+    alpha: 0
+
+  mlflow:
+    repo_owner: ronylpatil
+    repo_name: delivery-time-estm
