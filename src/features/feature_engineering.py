@@ -179,6 +179,10 @@ def impute_nan(train: pd.DataFrame, test: pd.DataFrame) -> pd.DataFrame:  # [STE
         test["multiple_deliveries"] = test["multiple_deliveries"].fillna(
             value=multiple_deliveries__fillna
         )
+        
+        # # fixing datatype
+        train["multiple_deliveries"] = train["multiple_deliveries"].astype("Int64")
+        test["multiple_deliveries"] = test["multiple_deliveries"].astype("Int64")
 
         # filling missing with mode of col
         road_traffic_density__fillna = train["Road_traffic_density"].mode()[0]
