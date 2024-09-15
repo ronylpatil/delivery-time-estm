@@ -24,7 +24,7 @@ feature_engineering:
 
 train_model:
   # {decision_tree: 'dt', random_forest: 'rf', gradient boost: 'gb', xgboost: 'xgb', all models: 'all'}
-  model_to_train: gb
+  model_to_train: xgb
 
   decision_tree:
     criterion: squared_error
@@ -58,7 +58,7 @@ train_model:
     n_iter_no_change: 13
 
   xgb:
-    booster: gbree # {gbtree, gblinear, dart}
+    booster: gbtree # {gbtree, gblinear, dart}
     verbosity: 0 # {print message for debuging 0: None, 1: warning, 2: info, 3: debug}
     eta: 0.3 # {learning rate}
     gamma: 0 # {}
