@@ -24,7 +24,7 @@ feature_engineering:
 
 train_model:
   # {decision_tree: 'dt', random_forest: 'rf', gradient boost: 'gb', xgboost: 'xgb', all models: 'all'}
-  model_to_train: rf
+  model_to_train: gb
 
   decision_tree:
     criterion: squared_error
@@ -46,16 +46,16 @@ train_model:
     max_samples: 9000
 
   gradient_boost:
-    loss:
-    learning_rate:
-    n_estimators:
-    subsample:
-    min_samples_split:
-    min_weight_fraction_leaf:
-    max_depth:
-    max_features:
-    max_leaf_nodes:
-    n_iter_no_change:
+    loss: squared_error
+    learning_rate: 0.2
+    n_estimators: 100
+    subsample: 0.6
+    min_samples_split: 50
+    min_weight_fraction_leaf: 0.3 
+    max_depth: 3
+    max_features: 0.7
+    max_leaf_nodes: 50
+    n_iter_no_change: 13
 
   xgb:
     booster: gbree # {gbtree, gblinear, dart}

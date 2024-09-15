@@ -122,7 +122,7 @@ def train_model(
         try:
             model_dt = RandomForestRegressor(**params["random_forest"])
             model_dt.fit(x_train, y_train)
-            infologger.info("RandomForestRegressor fitted successfully.")
+            infologger.info("[STEP-1] RandomForestRegressor fitted successfully.")
         except Exception as e:
             infologger.error(
                 f"Failed to initilize RandomForestRegressor. [Error: {e}]. \n[File: {pathlib.Path(__file__)}]\n[Method: {inspect.currentframe().f_code.co_name}]"
@@ -190,16 +190,93 @@ def train_model(
             mlflow.sklearn.log_model(model_dt, "random forest", signature=signature)
             mlflow.set_tag("developer", "ronil")
             mlflow.set_tag("model", "random forest")
-            infologger.info("Experiment tracked successfully.")
+            infologger.info("[STEP-2] Experiment tracked successfully.")
 
         save_model(model=model_dt, model_dir=model_dir, model_name="model_rf")
+
+    if model_to_train == "gb" or model_to_train == "all":
+
+        try:
+            model_dt = GradientBoostingRegressor(**params["gradient_boost"])
+            model_dt.fit(x_train, y_train)
+            infologger.info("[STEP-1] GradientBoostingRegressor fitted successfully.")
+        except Exception as e:
+            infologger.error(
+                f"Failed to initilize GradientBoostingRegressor. [Error: {e}]. \n[File: {pathlib.Path(__file__)}]\n[Method: {inspect.currentframe().f_code.co_name}]"
+            )
+
+        y_pred = model_dt.predict(x_test)
+        mae = mean_absolute_error(y_test, y_pred)
+        mse = mean_squared_error(y_test, y_pred)
+        r2_ = r2_score(y_test, y_pred)
+        adj_r2 = adj_r2_score(r2_, x_train.shape[0], x_train.shape[1])
+
+        # setting MLflow
+        mlflow.set_experiment("DTE [GradientBoost]")
+        experiment_description = (
+            "Training gradient boost regressor."  # adding experiment description
+        )
+        mlflow.set_experiment_tag("mlflow.note.content", experiment_description)
+
+        with mlflow.start_run(description="Training GradientBoostingRegressor - ronil"):
+            mlflow.log_params(params["gradient_boost"])
+            mlflow.log_metrics(
+                {
+                    "mae": round(mae, 3),
+                    "mse": round(mse, 3),
+                    "r2_score": round(r2_, 3),
+                    "adj_r2": round(adj_r2, 3),
+                }
+            )
+
+            curr_time = datetime.now().strftime("%d%m%y-%H%M%S")
+            file_name = f"{home_dir}/figures/{curr_time}.png"
+            residual_plot(y_test=y_test, y_pred=y_pred, path=file_name)
+            mlflow.log_artifact(file_name, "residual plot")
+            mlflow.log_artifact(__file__)  # loging code with mlflow
+
+            # custom model signature
+            input_schema = Schema(
+                [
+                    ColSpec("integer", "Age"),
+                    ColSpec("float", "Ratings"),
+                    ColSpec("integer", "Weatherconditions"),
+                    ColSpec("integer", "Road_traffic_density"),
+                    ColSpec("integer", "Vehicle_condition"),
+                    ColSpec("integer", "Type_of_order"),
+                    ColSpec("integer", "Type_of_vehicle"),
+                    ColSpec("integer", "multiple_deliveries"),
+                    ColSpec("integer", "Festival"),
+                    ColSpec("integer", "City"),
+                    ColSpec("float", "haversine_dist"),
+                    ColSpec("float", "estm_time"),
+                    ColSpec("float", "time_lag"),
+                    ColSpec("float", "hour"),
+                    ColSpec("integer", "day"),
+                    ColSpec("integer", "is_weekend"),
+                    ColSpec("integer", "is_rush"),
+                ]
+            )
+
+            # Define a custom output schema
+            output_schema = Schema([ColSpec("float", "Time_taken(min)")])
+
+            # Create a signature
+            signature = ModelSignature(inputs=input_schema, outputs=output_schema)
+
+            mlflow.sklearn.log_model(model_dt, "gradient boost", signature=signature)
+            mlflow.set_tag("developer", "ronil")
+            mlflow.set_tag("model", "gradient boost")
+            infologger.info("[STEP-2] Experiment tracked successfully.")
+
+        save_model(model=model_dt, model_dir=model_dir, model_name="model_gb")
 
 
 def save_model(model: BaseEstimator, model_dir: str, model_name: str) -> None:
     try:
         joblib.dump(model, f"{model_dir}/{model_name}.joblib")
         infologger.info(
-            f"Model saved successfully [Path: {model_dir}/{model_name}.joblib]"
+            f"[STEP-3] Model saved successfully [Path: {model_dir}/{model_name}.joblib]"
         )
     except Exception as e:
         infologger.error(
@@ -212,7 +289,8 @@ if __name__ == "__main__":
     curr_dir = pathlib.Path(__file__)
     home_dir = curr_dir.parent.parent.parent.as_posix()
 
-    params = yaml.safe_load(open(f"{home_dir}/params.yaml"))["train_model"]
+    params_obj = yaml.safe_load(open(f"{home_dir}/params.yaml"))
+    params = params_obj["train_model"]
     model_dir = f"{home_dir}/models"
 
     dagshub.init(
@@ -223,10 +301,10 @@ if __name__ == "__main__":
 
     train_df = pd.read_csv(f"{home_dir}/data/processed/processed_train.csv")
     test_df = pd.read_csv(f"{home_dir}/data/processed/processed_test.csv")
-    x_train = train_df.drop(columns=["Time_taken(min)"])
-    y_train = train_df["Time_taken(min)"]
-    x_test = test_df.drop(columns=["Time_taken(min)"])
-    y_test = test_df["Time_taken(min)"]
+    x_train = train_df.drop(columns=params_obj["base"]["target"])
+    y_train = train_df[params_obj["base"]["target"]]
+    x_test = test_df.drop(columns=params_obj["base"]["target"])
+    y_test = test_df[params_obj["base"]["target"]]
 
     train_model(
         x_train,
