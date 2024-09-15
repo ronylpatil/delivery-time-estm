@@ -1,8 +1,6 @@
-delivery_time_estm
+Delivery Time Estimation📦
 ==============================
 <b>DagsHub</b> - [ronylpatil/delivery-time-estm](https://dagshub.com/ronylpatil/delivery-time-estm)
-
-e2e delivery time estimation project
 
 Project Organization
 ------------
