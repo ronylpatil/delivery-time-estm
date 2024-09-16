@@ -56,8 +56,8 @@ stages:
       size: 6221136
     - path: ./src/features/feature_engineering.py
       hash: md5
-      md5: 2c8f145da5e2147530d09b3ce026a68d
-      size: 17462
+      md5: fbd5d310d3a236b69889456f96bf8e10
+      size: 17764
     params:
       params.yaml:
         feature_engineering.export_path: /data/processed
@@ -69,9 +69,72 @@ stages:
     outs:
     - path: ./data/processed/processed_test.csv
       hash: md5
-      md5: e812d49c3b3b641bdccc6aed52e49ec1
-      size: 500619
+      md5: 4f75b93d329d5a51cd619469c84c1820
+      size: 483191
     - path: ./data/processed/processed_train.csv
       hash: md5
-      md5: 4a91da2fdfb01444b323df2498a95586
-      size: 2002558
+      md5: ae10fc577ecbf3cfe7311c1af6e59e2c
+      size: 1932798
+  train_model:
+    cmd: python ./src/models/train_model.py
+    deps:
+    - path: ./data/processed/processed_test.csv
+      hash: md5
+      md5: 4f75b93d329d5a51cd619469c84c1820
+      size: 483191
+    - path: ./data/processed/processed_train.csv
+      hash: md5
+      md5: ae10fc577ecbf3cfe7311c1af6e59e2c
+      size: 1932798
+    - path: ./src/models/train_model.py
+      hash: md5
+      md5: 19e77eb2eec71235661cbea2f088c3d6
+      size: 16692
+    params:
+      params.yaml:
+        base.target: Time_taken(min)
+        feature_engineering.export_path: /data/processed
+        mlflow.repo_name: delivery-time-estm
+        mlflow.repo_owner: ronylpatil
+        train_model.decision_tree:
+          criterion: squared_error
+          max_depth: 35
+          min_samples_split: 40
+          min_samples_leaf: 200
+          max_features: sqrt
+          max_leaf_nodes: 80
+        train_model.gradient_boost:
+          loss: squared_error
+          learning_rate: 0.2
+          n_estimators: 100
+          subsample: 0.6
+          min_samples_split: 50
+          min_weight_fraction_leaf: 0.3
+          max_depth: 3
+          max_features: 0.7
+          max_leaf_nodes: 50
+          n_iter_no_change: 13
+        train_model.model_to_train: rf
+        train_model.random_forest:
+          n_estimators: 100
+          criterion: squared_error
+          max_depth: 10
+          min_samples_split: 40
+          min_samples_leaf: 150
+          max_features: 0.7
+          max_leaf_nodes: 50
+          oob_score: true
+          max_samples: 9000
+        train_model.xgb:
+          booster: gbtree
+          verbosity: 0
+          eta: 0.21
+          gamma: 0
+          max_depth: 7
+          lambda: 1
+          alpha: 0
+    outs:
+    - path: ./models/model_rf.joblib
+      hash: md5
+      md5: 9db60ee5ac0af303377f8d17e1fca91b
+      size: 869526

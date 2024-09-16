@@ -40,3 +40,22 @@ stages:
     outs:
     - .${feature_engineering.export_path}/${feature_engineering.filename_train}.csv
     - .${feature_engineering.export_path}/${feature_engineering.filename_test}.csv
+
+  train_model:
+    cmd: python ./src/models/train_model.py
+    deps: 
+    - ./src/models/train_model.py
+    - .${feature_engineering.export_path}/${feature_engineering.filename_train}.csv
+    - .${feature_engineering.export_path}/${feature_engineering.filename_test}.csv
+    params:
+    - base.target
+    - feature_engineering.export_path
+    - mlflow.repo_name
+    - mlflow.repo_owner
+    - train_model.model_to_train
+    - train_model.decision_tree
+    - train_model.random_forest
+    - train_model.gradient_boost
+    - train_model.xgb
+    outs:
+    - ./models/${train_model.model_name}.joblib
