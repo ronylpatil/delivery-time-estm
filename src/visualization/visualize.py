@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 def residual_plot(y_test: pandas.Series, y_pred: pandas.Series, path: str) -> None:
     residuals = y_test - y_pred
     plt.figure(figsize=(6, 4))
-    plt.axhline(y=0, color="black", linestyle="-")
+    plt.axhline(y=0, color="black", linestyle="--")
     sns.scatterplot(x=y_pred, y=residuals, color="orange")
 
     plt.xlabel("Predicted Values")

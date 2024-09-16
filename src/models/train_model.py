@@ -40,7 +40,7 @@ def train_model(
             * ((no_of_samples - 1) / (no_of_samples - no_of_features - 1))
         )
 
-    if model_to_train == "dt" or model_to_train == "all":
+    if model_to_train == "dt":
 
         try:
             model_dt = DecisionTreeRegressor(**params["decision_tree"])
@@ -115,9 +115,9 @@ def train_model(
             mlflow.set_tag("model", "decision tree")
             infologger.info("Experiment tracked successfully.")
 
-        save_model(model=model_dt, model_dir=model_dir, model_name="model_dt")
+        save_model(model=model_dt, model_dir=model_dir, model_name=params["model_name"])
 
-    if model_to_train == "rf" or model_to_train == "all":
+    if model_to_train == "rf":
 
         try:
             model_rf = RandomForestRegressor(**params["random_forest"])
@@ -192,9 +192,9 @@ def train_model(
             mlflow.set_tag("model", "random forest")
             infologger.info("[STEP-2] Experiment tracked successfully.")
 
-        save_model(model=model_rf, model_dir=model_dir, model_name="model_rf")
+        save_model(model=model_rf, model_dir=model_dir, model_name=params["model_name"])
 
-    if model_to_train == "gb" or model_to_train == "all":
+    if model_to_train == "gb":
 
         try:
             model_gb = GradientBoostingRegressor(**params["gradient_boost"])
@@ -269,9 +269,9 @@ def train_model(
             mlflow.set_tag("model", "gradient boost")
             infologger.info("[STEP-2] Experiment tracked successfully.")
 
-        save_model(model=model_gb, model_dir=model_dir, model_name="model_gb")
+        save_model(model=model_gb, model_dir=model_dir, model_name=params["model_name"])
 
-    if model_to_train == "xgb" or model_to_train == "all":
+    if model_to_train == "xgb":
 
         try:
             model_xgb = XGBRegressor(**params["xgb"])
@@ -346,7 +346,9 @@ def train_model(
             mlflow.set_tag("model", "xgboost")
             infologger.info("[STEP-2] Experiment tracked successfully.")
 
-        save_model(model=model_xgb, model_dir=model_dir, model_name="model_xgb")
+        save_model(
+            model=model_xgb, model_dir=model_dir, model_name=params["model_name"]
+        )
 
 
 def save_model(model: BaseEstimator, model_dir: str, model_name: str) -> None:
@@ -371,13 +373,17 @@ if __name__ == "__main__":
     model_dir = f"{home_dir}/models"
 
     dagshub.init(
-        repo_owner=params["mlflow"]["repo_owner"],
-        repo_name=params["mlflow"]["repo_name"],
+        repo_owner=params_obj["mlflow"]["repo_owner"],
+        repo_name=params_obj["mlflow"]["repo_name"],
         mlflow=True,
     )
 
-    train_df = pd.read_csv(f"{home_dir}/data/processed/processed_train.csv")
-    test_df = pd.read_csv(f"{home_dir}/data/processed/processed_test.csv")
+    train_df = pd.read_csv(
+        f"{home_dir}{params_obj['feature_engineering']['export_path']}/processed_train.csv"
+    )
+    test_df = pd.read_csv(
+        f"{home_dir}{params_obj['feature_engineering']['export_path']}/processed_test.csv"
+    )
     x_train = train_df.drop(columns=params_obj["base"]["target"])
     y_train = train_df[params_obj["base"]["target"]]
     x_test = test_df.drop(columns=params_obj["base"]["target"])
