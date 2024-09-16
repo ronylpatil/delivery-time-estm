@@ -53,6 +53,7 @@ stages:
     - mlflow.repo_name
     - mlflow.repo_owner
     - train_model.model_to_train
+    - train_model.model_name
     - train_model.decision_tree
     - train_model.random_forest
     - train_model.gradient_boost

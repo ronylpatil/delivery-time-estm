@@ -29,7 +29,7 @@ mlflow:
 train_model:
   # {decision_tree: 'dt', random_forest: 'rf', gradient boost: 'gb', xgboost: 'xgb', all models: 'all'}
   model_to_train: rf
-  model_name: model_rf
+  model_name: model_rf        # IMP PLEASE CHANGE NAME
 
   decision_tree:
     criterion: squared_error
