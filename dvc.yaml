@@ -17,19 +17,22 @@ stages:
     - .${load_dataset.raw_data}/${load_dataset.filename}
     params:
     - make_dataset.input_path
-    - make_dataset.test_split
+    - make_dataset.holdout_split
+    - make_dataset.unit_test_split
     - make_dataset.seed
-    - make_dataset.export_path
+    - make_dataset.train_test_path
+    - make_dataset.unit_test_path
     outs:
-    - .${make_dataset.export_path}/train.csv
-    - .${make_dataset.export_path}/test.csv
+    - .${make_dataset.train_test_path}/train.csv
+    - .${make_dataset.train_test_path}/test.csv
+    - .${make_dataset.unit_test_path}/unit_test.csv
 
   feature_engineering:
     cmd: python ./src/features/feature_engineering.py
     deps:
     - ./src/features/feature_engineering.py
-    - .${make_dataset.export_path}/train.csv
-    - .${make_dataset.export_path}/test.csv
+    - .${make_dataset.train_test_path}/train.csv
+    - .${make_dataset.train_test_path}/test.csv
     params:
     - feature_engineering.input_path__train
     - feature_engineering.input_path__test

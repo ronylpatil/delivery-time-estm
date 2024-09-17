@@ -10,9 +10,11 @@ load_dataset:
 
 make_dataset:
   input_path: data/raw/train.csv
-  test_split: 0.2
+  holdout_split: 0.2
+  unit_test_split: 0.1
   seed: 42
-  export_path: /data/interim
+  train_test_path: /data/interim
+  unit_test_path: /tests/data
 
 feature_engineering:
   input_path__train: data/interim/train.csv
