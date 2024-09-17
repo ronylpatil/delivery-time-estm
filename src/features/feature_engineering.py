@@ -25,7 +25,7 @@ import numpy as np
 import pandas as pd
 from src.logger import infologger
 from sklearn.preprocessing import LabelEncoder
-from src.data.make_dataset import load_data, save_data
+from src.data.make_dataset import load_data
 from math import radians, sin, cos, sqrt, atan2
 
 
@@ -487,6 +487,24 @@ def preprocessing(
         return train, test
 
 
+# save the data
+def save_data_(
+    export_path: str,
+    train: pd.DataFrame,
+    test: pd.DataFrame,
+    train_filename: str = "train",
+    test_filename: str = "test",
+) -> None:
+    try:
+        train.to_csv(f"{export_path}/{train_filename}.csv", index=False)
+        test.to_csv(f"{export_path}/{test_filename}.csv", index=False)
+    except Exception as e:
+        infologger.error(f"unable to save the data [check save_data()]. exc: {e}")
+    else:
+        infologger.info(f"training data saved successfully [path: {export_path}]")
+        infologger.info(f"test data saved successfully [path: {export_path}]")
+
+
 if __name__ == "__main__":
     infologger.info("executing build_features.py as __main__")
 
@@ -523,7 +541,7 @@ if __name__ == "__main__":
 
     # save the data
     export_path = f"{home_dir}/{params["export_path"]}"
-    save_data(
+    save_data_(
         export_path=export_path,
         train=train_st5,
         test=test_st5,
