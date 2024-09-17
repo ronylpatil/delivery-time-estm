@@ -11,35 +11,56 @@ def load_data(input_path: str) -> pd.DataFrame:
     try:
         df = pd.read_csv(input_path)
     except Exception as e:
-        infologger.info(f"unable to load data [check load_data()]. exc: {e}")
+        infologger.error(f"unable to load data [check load_data()]. exc: {e}")
     else:
         infologger.info(f"data loaded successfully [source: {input_path}]")
         return df
 
 
 # split the data
-def split(df: pd.DataFrame, test_split: float, seed: int) -> pd.DataFrame:
+def split(
+    df: pd.DataFrame, holdout_split: float, unit_test_split: float, seed: int
+) -> pd.DataFrame:
     try:
-        train, test = train_test_split(df, test_size=test_split, random_state=seed)
+        train, holdout = train_test_split(
+            df, test_size=holdout_split, random_state=seed
+        )
+        test, unit_test = train_test_split(
+            holdout, test_size=unit_test_split, random_state=seed
+        )
     except Exception as e:
-        infologger.info(f"unable to split the data [check split_data()]. exc: {e}")
+        infologger.error(f"unable to split the data [check split_data()]. exc: {e}")
     else:
         infologger.info(
-            f"data splited successfully [test_split: {test_split}, seed: {seed}]"
+            f"train-holdout splited successfully [holdout_split: {holdout_split}, seed: {seed}]"
         )
-        return train, test
+        infologger.info(
+            f"test-unit_test splited successfully [unit_test_split: {unit_test_split}, seed: {seed}]"
+        )
+        return train, test, unit_test
 
 
 # save the data
-def save_data(export_path: str, train: pd.DataFrame, test: pd.DataFrame, train_filename: str = 'train', test_filename: str = 'test') -> None:
+def save_data(
+    train_test_path: str,
+    unit_test_path: str,
+    train: pd.DataFrame,
+    test: pd.DataFrame,
+    unit_test: pd.DataFrame,
+    train_filename: str = "train",
+    test_filename: str = "test",
+    unit_test_filename: str = "unit_test",
+) -> None:
     try:
-        train.to_csv(f"{export_path}/{train_filename}.csv", index=False)
-        test.to_csv(f"{export_path}/{test_filename}.csv", index=False)
+        train.to_csv(f"{train_test_path}/{train_filename}.csv", index=False)
+        test.to_csv(f"{train_test_path}/{test_filename}.csv", index=False)
+        unit_test.to_csv(f"{unit_test_path}/{unit_test_filename}.csv", index=False)
     except Exception as e:
-        infologger.info(f"unable to save the data [check save_data()]. exc: {e}")
+        infologger.error(f"unable to save the data [check save_data()]. exc: {e}")
     else:
-        infologger.info(f"training data saved successfully [path: {export_path}]")
-        infologger.info(f"test data saved successfully [path: {export_path}]")
+        infologger.info(f"training data saved successfully [path: {train_test_path}]")
+        infologger.info(f"test data saved successfully [path: {train_test_path}]")
+        infologger.info(f"unit_test data saved successfully [path: {unit_test_path}]")
 
 
 if __name__ == "__main__":
@@ -51,6 +72,11 @@ if __name__ == "__main__":
     input_path = f"{home_dir}/{params['input_path']}"
 
     df = load_data(input_path=input_path)
-    train, test = split(df, test_split=params["test_split"], seed=params["seed"])
+    train, test, unit_test = split(
+        df,
+        holdout_split=params["holdout_split"],
+        unit_test_split=params["unit_test_split"],
+        seed=params["seed"],
+    )
     
-    save_data(f"{home_dir}/{params["export_path"]}", train=train, test=test)
+    save_data(f"{home_dir}/{params["train_test_path"]}", f"{home_dir}/{params["unit_test_path"]}", train=train, test=test, unit_test=unit_test)
