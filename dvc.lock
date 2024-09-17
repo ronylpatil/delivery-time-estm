@@ -26,38 +26,44 @@ stages:
       size: 7776332
     - path: ./src/data/make_dataset.py
       hash: md5
-      md5: 1c1df82e4abed0d60960517b7396403a
-      size: 2114
+      md5: edc10b5b8aaa51be7f9b0910d42a3032
+      size: 2964
     params:
       params.yaml:
-        make_dataset.export_path: /data/interim
+        make_dataset.holdout_split: 0.2
         make_dataset.input_path: data/raw/train.csv
         make_dataset.seed: 42
-        make_dataset.test_split: 0.2
+        make_dataset.train_test_path: /data/interim
+        make_dataset.unit_test_path: /tests/data
+        make_dataset.unit_test_split: 0.1
     outs:
     - path: ./data/interim/test.csv
       hash: md5
-      md5: 558cb0951a0bfbf1e461471f379873c8
-      size: 1555537
+      md5: 84ecc6ab9dffc8ee1bb7ae3a734e291b
+      size: 1400466
     - path: ./data/interim/train.csv
       hash: md5
       md5: b9fa0322750583b38e0f0ce179731891
       size: 6221136
+    - path: ./tests/data/unit_test.csv
+      hash: md5
+      md5: 6c0a1249a3262a9cec959b222a7ad403
+      size: 155412
   feature_engineering:
     cmd: python ./src/features/feature_engineering.py
     deps:
     - path: ./data/interim/test.csv
       hash: md5
-      md5: 558cb0951a0bfbf1e461471f379873c8
-      size: 1555537
+      md5: 84ecc6ab9dffc8ee1bb7ae3a734e291b
+      size: 1400466
     - path: ./data/interim/train.csv
       hash: md5
       md5: b9fa0322750583b38e0f0ce179731891
       size: 6221136
     - path: ./src/features/feature_engineering.py
       hash: md5
-      md5: fbd5d310d3a236b69889456f96bf8e10
-      size: 17764
+      md5: 9449bb24852306677c846fc242fb5326
+      size: 18391
     params:
       params.yaml:
         feature_engineering.export_path: /data/processed
@@ -69,8 +75,8 @@ stages:
     outs:
     - path: ./data/processed/processed_test.csv
       hash: md5
-      md5: 4f75b93d329d5a51cd619469c84c1820
-      size: 483191
+      md5: 8fbf4dba54f10d8f1c9d6b1c85b81041
+      size: 435216
     - path: ./data/processed/processed_train.csv
       hash: md5
       md5: ae10fc577ecbf3cfe7311c1af6e59e2c
@@ -80,8 +86,8 @@ stages:
     deps:
     - path: ./data/processed/processed_test.csv
       hash: md5
-      md5: 4f75b93d329d5a51cd619469c84c1820
-      size: 483191
+      md5: 8fbf4dba54f10d8f1c9d6b1c85b81041
+      size: 435216
     - path: ./data/processed/processed_train.csv
       hash: md5
       md5: ae10fc577ecbf3cfe7311c1af6e59e2c
@@ -114,6 +120,7 @@ stages:
           max_features: 0.7
           max_leaf_nodes: 50
           n_iter_no_change: 13
+        train_model.model_name: model_rf
         train_model.model_to_train: rf
         train_model.random_forest:
           n_estimators: 100
@@ -136,5 +143,5 @@ stages:
     outs:
     - path: ./models/model_rf.joblib
       hash: md5
-      md5: 9db60ee5ac0af303377f8d17e1fca91b
-      size: 869526
+      md5: 4804de180ead9bca13523f33d5e725b0
+      size: 866646
