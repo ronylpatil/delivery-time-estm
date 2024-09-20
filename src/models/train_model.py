@@ -25,6 +25,12 @@ from src.visualization.visualize import residual_plot
 from src.logger import infologger
 
 
+def adj_r2_score(r2_score: float, no_of_samples: int, no_of_features: int) -> float:
+    return 1 - (
+        (1 - r2_score) * ((no_of_samples - 1) / (no_of_samples - no_of_features - 1))
+    )
+
+
 def train_model(
     x_train: pd.DataFrame,
     y_train: pd.Series,
@@ -33,12 +39,6 @@ def train_model(
     model_to_train: str,
     model_dir: str,
 ) -> None:
-
-    def adj_r2_score(r2_score: float, no_of_samples: int, no_of_features: int) -> float:
-        return 1 - (
-            (1 - r2_score)
-            * ((no_of_samples - 1) / (no_of_samples - no_of_features - 1))
-        )
 
     if model_to_train == "dt":
 
