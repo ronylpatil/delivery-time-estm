@@ -51,28 +51,38 @@ def objective_gbm(trial) -> float:
 def objective_xgb(trial) -> float:
     # Suggest values for the hyperparameters
     booster = trial.suggest_categorical("booster", ["gbtree", "gblinear", "dart"])
-    eta = trial.suggest_float("eta", 0.1, 0.3, step=0.01)
+    eta = trial.suggest_float("eta", 0.01, 0.3, step=0.01)
     gamma = trial.suggest_int("gamma", 30, 400)
     max_depth = trial.suggest_int("max_depth", 3, 8)
     # lambda = trial.suggest_float("max_features", 0.1, 0.9, step=0.1)
     alpha = trial.suggest_int("alpha", 0, 500)
-    tree_method = trial.suggest_categorical(
-        "tree_method", ["auto", "exact", "approx", "hist"]
-    )
+    # tree_method = trial.suggest_categorical(
+    #     "tree_method", ["auto", "exact", "approx", "hist"]
+    # )
+    colsample_bytree = trial.suggest_float("colsample_bytree", 0.4, 0.9, step=0.1)
+    colsample_bylevel = trial.suggest_float("colsample_bylevel", 0.4, 0.9, step=0.1)
+    colsample_bynode = trial.suggest_float("colsample_bynode", 0.4, 0.9, step=0.1)
+    subsample = trial.suggest_float("subsample", 0.5, 0.9, step=0.1)
 
     # Create the RandomForestClassifier with suggested hyperparameters
     model = XGBRegressor(
-        booster=booster,  # {gbtree, gblinear, dart}
-        eta=eta,  # {learning rate}
-        gamma=gamma,  # {}
-        max_depth=max_depth,  # {}
+        booster=booster,
+        eta=eta,
+        gamma=gamma,
+        max_depth=max_depth,
         # 'lambda' = 1,
         alpha=alpha,
-        tree_method=tree_method,
+        tree_method="auto",
+        colsample_bynode=colsample_bynode,
+        colsample_bylevel=colsample_bylevel,
+        colsample_bytree=colsample_bytree,
+        subsample=subsample,
     )
 
     # Perform 3-fold cross-validation and calculate accuracy
-    score = cross_val_score(model, x_train, y_train, cv=5, scoring="r2").mean()
+    score = cross_val_score(
+        model, x_train, y_train, cv=5, scoring="neg_mean_squared_error"
+    ).mean()
 
     return score  # Return the accuracy score for Optuna to maximize
 
@@ -114,12 +124,10 @@ if __name__ == "__main__":
     best_model.fit(x_train, y_train)
     y_pred = best_model.predict(x_test)
 
-    mae, mse, r2_, adj_r2 = (
-        mean_absolute_error(y_test, y_pred),
-        mean_squared_error(y_test, y_pred),
-        r2_score(y_test, y_pred),
-        adj_r2_score(r2_, x_train.shape[0], x_train.shape[1]),
-    )
+    mae = mean_absolute_error(y_test, y_pred)
+    mse = mean_squared_error(y_test, y_pred)
+    r2_ = r2_score(y_test, y_pred)
+    adj_r2 = adj_r2_score(r2_, x_train.shape[0], x_train.shape[1])
 
     # setting MLflow
     mlflow.set_experiment("DTE [Fine Tunning XGB]")
@@ -130,6 +138,7 @@ if __name__ == "__main__":
 
     with mlflow.start_run(description="Tunning XGBRegressor - ronil"):
         mlflow.log_params(study.best_trial.params)
+        mlflow.log_params({"n_trials": params["n_trials"]})
         mlflow.log_metrics(
             {
                 "mae": round(mae, 3),
@@ -173,6 +182,7 @@ if __name__ == "__main__":
         mlflow.sklearn.log_model(best_model, "tunned xgbR", signature=signature)
         mlflow.set_tag("developer", "ronil")
         mlflow.set_tag("model", "xgbR")
+        mlflow.set_tag("objective", "neg_mean_squared_error")
         infologger.info("Experiment tracked successfully.")
 
         save_model(
