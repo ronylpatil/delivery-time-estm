@@ -63,3 +63,19 @@ stages:
     - train_model.xgb
     outs:
     - ./models/${train_model.model_name}.joblib
+
+  tune_model:
+    cmd: python ./src/models/tune_model.py
+    deps:
+    - ./src/models/tune_model.py
+    - .${feature_engineering.export_path}/${feature_engineering.filename_train}.csv
+    - .${feature_engineering.export_path}/${feature_engineering.filename_test}.csv
+    params:
+    - base.target
+    - feature_engineering.export_path
+    - mlflow.repo_name
+    - mlflow.repo_owner
+    - tune_model.model_name
+    - tune_model.n_trials
+    outs:
+    - ./models/${tune_model.model_name}.joblib

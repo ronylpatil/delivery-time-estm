@@ -81,7 +81,7 @@ def objective_xgb(trial) -> float:
 
     # Perform 3-fold cross-validation and calculate accuracy
     score = cross_val_score(
-        model, x_train, y_train, cv=5, scoring="neg_mean_squared_error"
+        model, x_train, y_train, cv=5, scoring="neg_mean_absolute_error"
     ).mean()
 
     return score  # Return the accuracy score for Optuna to maximize
@@ -182,7 +182,7 @@ if __name__ == "__main__":
         mlflow.sklearn.log_model(best_model, "tunned xgbR", signature=signature)
         mlflow.set_tag("developer", "ronil")
         mlflow.set_tag("model", "xgbR")
-        mlflow.set_tag("objective", "neg_mean_squared_error")
+        mlflow.set_tag("objective", "neg_mean_absolute_error")
         infologger.info("Experiment tracked successfully.")
 
         save_model(

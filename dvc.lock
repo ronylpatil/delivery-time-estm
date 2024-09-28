@@ -94,8 +94,8 @@ stages:
       size: 1932798
     - path: ./src/models/train_model.py
       hash: md5
-      md5: 19e77eb2eec71235661cbea2f088c3d6
-      size: 16692
+      md5: 90f6f48a40e04b569de4dfe36fc48c71
+      size: 16665
     params:
       params.yaml:
         base.target: Time_taken(min)
@@ -145,3 +145,31 @@ stages:
       hash: md5
       md5: 4804de180ead9bca13523f33d5e725b0
       size: 866646
+  tune_model:
+    cmd: python ./src/models/tune_model.py
+    deps:
+    - path: ./data/processed/processed_test.csv
+      hash: md5
+      md5: 8fbf4dba54f10d8f1c9d6b1c85b81041
+      size: 435216
+    - path: ./data/processed/processed_train.csv
+      hash: md5
+      md5: ae10fc577ecbf3cfe7311c1af6e59e2c
+      size: 1932798
+    - path: ./src/models/tune_model.py
+      hash: md5
+      md5: 9f7e26afd8ac368de8c0de728cdd0fb2
+      size: 7639
+    params:
+      params.yaml:
+        base.target: Time_taken(min)
+        feature_engineering.export_path: /data/processed
+        mlflow.repo_name: delivery-time-estm
+        mlflow.repo_owner: ronylpatil
+        tune_model.model_name: xgb_tunned
+        tune_model.n_trials: 50
+    outs:
+    - path: ./models/xgb_tunned.joblib
+      hash: md5
+      md5: e45b2fd0bfcb258d1b3fa27cfdc77132
+      size: 253468

@@ -72,3 +72,7 @@ train_model:
     max_depth: 7 # {}
     lambda: 1
     alpha: 0
+
+tune_model:
+  model_name: xgb_tunned
+  n_trials: 50
