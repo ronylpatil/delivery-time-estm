@@ -120,8 +120,8 @@ stages:
           max_features: 0.7
           max_leaf_nodes: 50
           n_iter_no_change: 13
-        train_model.model_name: model_rf
-        train_model.model_to_train: rf
+        train_model.model_name: model_xgb
+        train_model.model_to_train: xgb
         train_model.random_forest:
           n_estimators: 100
           criterion: squared_error
@@ -135,16 +135,16 @@ stages:
         train_model.xgb:
           booster: gbtree
           verbosity: 0
-          eta: 0.21
+          eta: 0.3
           gamma: 0
-          max_depth: 7
+          max_depth: 6
           lambda: 1
           alpha: 0
     outs:
-    - path: ./models/model_rf.joblib
+    - path: ./models/model_xgb.joblib
       hash: md5
-      md5: 4804de180ead9bca13523f33d5e725b0
-      size: 866646
+      md5: 5b3624e0f22c4ef3ad891b53e5aac0fc
+      size: 480723
   tune_model:
     cmd: python ./src/models/tune_model.py
     deps:

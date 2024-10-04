@@ -1,2 +1,3 @@
 /model_rf.joblib
 /xgb_tunned.joblib
+/model_xgb.joblib
