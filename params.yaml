@@ -75,4 +75,4 @@ train_model:
 
 tune_model:
   model_name: xgb_tunned
-  n_trials: 50
+  n_trials: 100

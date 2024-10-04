@@ -51,7 +51,7 @@ def objective_gbm(trial) -> float:
 def objective_xgb(trial) -> float:
     # Suggest values for the hyperparameters
     booster = trial.suggest_categorical("booster", ["gbtree", "gblinear", "dart"])
-    eta = trial.suggest_float("eta", 0.01, 0.3, step=0.01)
+    eta = trial.suggest_float("eta", 0.1, 0.3, step=0.01)
     gamma = trial.suggest_int("gamma", 30, 400)
     max_depth = trial.suggest_int("max_depth", 3, 8)
     # lambda = trial.suggest_float("max_features", 0.1, 0.9, step=0.1)
