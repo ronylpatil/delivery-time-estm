@@ -29,7 +29,7 @@ mlflow:
   repo_name: delivery-time-estm
 
 train_model:
-  # {decision_tree: 'dt', random_forest: 'rf', gradient boost: 'gb', xgboost: 'xgb', all models: 'all'}
+  # {decision_tree: 'dt', random_forest: 'rf', gradient boost: 'gb', xgboost: 'xgb', lightgbm: 'lightgbm'}
   model_to_train: lightgbm
   model_name: model_lgbm        # IMP PLEASE CHANGE NAME
 
@@ -74,5 +74,5 @@ train_model:
     alpha: 0
 
 tune_model:
-  model_name: xgb_tunned
+  model_name: lgbm_tunned
   n_trials: 100

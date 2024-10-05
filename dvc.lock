@@ -158,18 +158,18 @@ stages:
       size: 1932798
     - path: ./src/models/tune_model.py
       hash: md5
-      md5: 068e865549b7a559aba40b3fb6ec4dbe
-      size: 7638
+      md5: 276d7dc0756ab95db5edd5545bc7346e
+      size: 8967
     params:
       params.yaml:
         base.target: Time_taken(min)
         feature_engineering.export_path: /data/processed
         mlflow.repo_name: delivery-time-estm
         mlflow.repo_owner: ronylpatil
-        tune_model.model_name: xgb_tunned
+        tune_model.model_name: lgbm_tunned
         tune_model.n_trials: 100
     outs:
-    - path: ./models/xgb_tunned.joblib
+    - path: ./models/lgbm_tunned.joblib
       hash: md5
-      md5: 72c2a3052e23d636a4ea72c49d3a276b
-      size: 165687
+      md5: 39c309fa4af074d60e6c248206ff13f4
+      size: 431794

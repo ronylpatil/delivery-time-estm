@@ -2,3 +2,4 @@
 /xgb_tunned.joblib
 /model_xgb.joblib
 /model_lgbm.joblib
+/lgbm_tunned.joblib

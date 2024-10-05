@@ -5,6 +5,7 @@ import mlflow
 import pathlib
 import dagshub
 import pandas as pd
+from lightgbm import LGBMRegressor
 from xgboost import XGBRegressor  # type: ignore
 from mlflow.models import ModelSignature
 from mlflow.types.schema import Schema, ColSpec
@@ -86,6 +87,35 @@ def objective_xgb(trial) -> float:
 
     return score  # Return the accuracy score for Optuna to maximize
 
+def objective_lgbm(trial) -> float:
+    # Suggest values for the hyperparameters
+    boosting_type = trial.suggest_categorical("boosting_type", ["gbdt", "dart"])
+    num_leaves = trial.suggest_int("num_leaves", 20, 50)
+    max_depth = trial.suggest_int("max_depth", 3, 7)   
+    learning_rate = trial.suggest_float("learning_rate", 0.1, 0.3, step=0.01)
+    n_estimators  = trial.suggest_int("n_estimators ", 50, 200)
+    reg_alpha  = trial.suggest_float("reg_alpha", 0.1, 0.5, step=0.1)
+    reg_lambda   = trial.suggest_float("reg_lambda", 0.1, 0.5, step=0.1)
+    min_child_samples = trial.suggest_int("min_child_samples", 20, 200)
+
+    # Create the RandomForestClassifier with suggested hyperparameters
+    model = LGBMRegressor(
+        boosting_type=boosting_type,
+        num_leaves=num_leaves,
+        max_depth=max_depth,
+        learning_rate=learning_rate,
+        n_estimators=n_estimators,
+        reg_alpha=reg_alpha,
+        reg_lambda=reg_lambda,
+        min_child_samples=min_child_samples
+    )
+
+    # Perform 3-fold cross-validation and calculate accuracy
+    score = cross_val_score(
+        model, x_train, y_train, cv=5, scoring="neg_mean_absolute_error"
+    ).mean()
+
+    return score  # Return the accuracy score for Optuna to maximize
 
 if __name__ == "__main__":
 
@@ -117,10 +147,10 @@ if __name__ == "__main__":
     study = optuna.create_study(
         direction="maximize", sampler=optuna.samplers.TPESampler()
     )  # We aim to maximize accuracy
-    study.optimize(objective_xgb, n_trials=params["n_trials"])
+    study.optimize(objective_lgbm, n_trials=params["n_trials"])
 
     # training model with optimized hyperparameters
-    best_model = XGBRegressor(**study.best_trial.params)
+    best_model = LGBMRegressor(**study.best_trial.params)
     best_model.fit(x_train, y_train)
     y_pred = best_model.predict(x_test)
 
@@ -130,13 +160,13 @@ if __name__ == "__main__":
     adj_r2 = adj_r2_score(r2_, x_train.shape[0], x_train.shape[1])
 
     # setting MLflow
-    mlflow.set_experiment("DTE [Fine Tunning XGB]")
+    mlflow.set_experiment("DTE [Fine Tunning LGBM]")
     experiment_description = (
-        "Tunning xgboost regressor."  # adding experiment description
+        "Tunning lightgbm regressor."  # adding experiment description
     )
     mlflow.set_experiment_tag("mlflow.note.content", experiment_description)
 
-    with mlflow.start_run(description="Tunning XGBRegressor - ronil"):
+    with mlflow.start_run(description="Tunning LGBMRegressor - ronil"):
         mlflow.log_params(study.best_trial.params)
         mlflow.log_params({"n_trials": params["n_trials"]})
         mlflow.log_metrics(
@@ -179,9 +209,9 @@ if __name__ == "__main__":
         # Create a signature
         signature = ModelSignature(inputs=input_schema, outputs=output_schema)
 
-        mlflow.sklearn.log_model(best_model, "tunned xgbR", signature=signature)
+        mlflow.sklearn.log_model(best_model, "tunned lgbmR", signature=signature)
         mlflow.set_tag("developer", "ronil")
-        mlflow.set_tag("model", "xgbR")
+        mlflow.set_tag("model", "lgbmR")
         mlflow.set_tag("objective", "neg_mean_absolute_error")
         infologger.info("Experiment tracked successfully.")
 
