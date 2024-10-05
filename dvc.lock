@@ -94,8 +94,8 @@ stages:
       size: 1932798
     - path: ./src/models/train_model.py
       hash: md5
-      md5: 90f6f48a40e04b569de4dfe36fc48c71
-      size: 16665
+      md5: b082ca07b5418b81dee5bd4293f88c85
+      size: 20270
     params:
       params.yaml:
         base.target: Time_taken(min)
@@ -120,8 +120,8 @@ stages:
           max_features: 0.7
           max_leaf_nodes: 50
           n_iter_no_change: 13
-        train_model.model_name: model_xgb
-        train_model.model_to_train: xgb
+        train_model.model_name: model_lgbm
+        train_model.model_to_train: lightgbm
         train_model.random_forest:
           n_estimators: 100
           criterion: squared_error
@@ -141,10 +141,10 @@ stages:
           lambda: 1
           alpha: 0
     outs:
-    - path: ./models/model_xgb.joblib
+    - path: ./models/model_lgbm.joblib
       hash: md5
-      md5: 5b3624e0f22c4ef3ad891b53e5aac0fc
-      size: 480723
+      md5: 7838430e1973c7ca9572297fef4387d4
+      size: 287673
   tune_model:
     cmd: python ./src/models/tune_model.py
     deps:

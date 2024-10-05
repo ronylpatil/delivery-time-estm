@@ -13,6 +13,7 @@ import dagshub
 import inspect
 import pathlib
 import pandas as pd
+import lightgbm as lgb
 from datetime import datetime
 from sklearn.base import BaseEstimator
 from xgboost import XGBRegressor  # type: ignore
@@ -348,6 +349,87 @@ def train_model(
 
         save_model(
             model=model_xgb, model_dir=model_dir, model_name=params["model_name"]
+        )
+
+    if model_to_train == "lightgbm":
+
+        try:
+            model_lgbm = lgb.LGBMRegressor()  # ___change___
+            model_lgbm.fit(x_train, y_train)
+            infologger.info("[STEP-1] LightGBM fitted successfully.")  # ___change___
+        except Exception as e:
+            infologger.error(  # ___change___
+                f"Failed to initilize LightGBM. [Error: {e}]. \n[File: {pathlib.Path(__file__)}]\n[Method: {inspect.currentframe().f_code.co_name}]"
+            )
+
+        y_pred = model_lgbm.predict(x_test)
+        mae = mean_absolute_error(y_test, y_pred)
+        mse = mean_squared_error(y_test, y_pred)
+        r2_ = r2_score(y_test, y_pred)
+        adj_r2 = adj_r2_score(r2_, x_train.shape[0], x_train.shape[1])
+
+        # setting MLflow
+        mlflow.set_experiment("DTE [LGBM]")  # ___change___
+        experiment_description = "Training lightgbm regressor."  # adding experiment description             # ___change___
+        mlflow.set_experiment_tag("mlflow.note.content", experiment_description)
+
+        with mlflow.start_run(description="Training LightGBM - ronil"):  # ___change___
+            # mlflow.log_params(params["xgb"])
+            mlflow.log_metrics(
+                {
+                    "mae": round(mae, 3),
+                    "mse": round(mse, 3),
+                    "r2_score": round(r2_, 3),
+                    "adj_r2": round(adj_r2, 3),
+                }
+            )
+
+            curr_time = datetime.now().strftime("%d%m%y-%H%M%S")
+            file_name = f"{home_dir}/figures/{curr_time}.png"
+            residual_plot(y_test=y_test, y_pred=y_pred, path=file_name)
+            mlflow.log_artifact(file_name, "residual plot")
+            mlflow.log_artifact(__file__)  # loging code with mlflow
+
+            # custom model signature
+            input_schema = Schema(
+                [
+                    ColSpec("integer", "Age"),
+                    ColSpec("float", "Ratings"),
+                    ColSpec("integer", "Weatherconditions"),
+                    ColSpec("integer", "Road_traffic_density"),
+                    ColSpec("integer", "Vehicle_condition"),
+                    ColSpec("integer", "Type_of_order"),
+                    ColSpec("integer", "Type_of_vehicle"),
+                    ColSpec("integer", "multiple_deliveries"),
+                    ColSpec("integer", "Festival"),
+                    ColSpec("integer", "City"),
+                    ColSpec("float", "haversine_dist"),
+                    ColSpec("float", "estm_time"),
+                    ColSpec("float", "time_lag"),
+                    ColSpec("float", "hour"),
+                    ColSpec("integer", "day"),
+                    ColSpec("integer", "is_weekend"),
+                    ColSpec("integer", "is_rush"),
+                ]
+            )
+
+            # Define a custom output schema
+            output_schema = Schema([ColSpec("float", "Time_taken(min)")])
+
+            # Create a signature
+            signature = ModelSignature(inputs=input_schema, outputs=output_schema)
+
+            mlflow.sklearn.log_model(
+                model_lgbm, "lightgbm", signature=signature
+            )  # ___change___
+            mlflow.set_tag("developer", "ronil")
+            mlflow.set_tag("model", "lightgbm")  # ___change___
+            infologger.info("[STEP-2] Experiment tracked successfully.")
+
+        save_model(
+            model=model_lgbm,
+            model_dir=model_dir,
+            model_name=params["model_name"],  # ___change___
         )
 
 
